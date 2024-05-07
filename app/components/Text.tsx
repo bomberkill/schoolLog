@@ -47,9 +47,8 @@ export interface TextProps extends RNTextProps {
 /**
  * For your text displaying needs.
  * This component is a HOC over the built-in React Native one.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/components/Text/}
- * @param {TextProps} props - The props for the `Text` component.
- * @returns {JSX.Element} The rendered `Text` component.
+ *
+ * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-Text.md)
  */
 export function Text(props: TextProps) {
   const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props
@@ -57,12 +56,12 @@ export function Text(props: TextProps) {
   const i18nText = tx && translate(tx, txOptions)
   const content = i18nText || text || children
 
-  const preset: Presets = props.preset ?? "default"
-  const $styles: StyleProp<TextStyle> = [
+  const preset: Presets = $presets[props.preset] ? props.preset : "default"
+  const $styles = [
     $rtlStyle,
     $presets[preset],
-    weight && $fontWeightStyles[weight],
-    size && $sizeStyles[size],
+    $fontWeightStyles[weight],
+    $sizeStyles[size],
     $styleOverride,
   ]
 

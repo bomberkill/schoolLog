@@ -17,6 +17,7 @@ import * as Screens from "app/screens"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
+import {MainBottomTabNavigator} from "app/navigators"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -34,7 +35,12 @@ import { colors } from "app/theme"
 export type AppStackParamList = {
   Welcome: undefined
   // 🔥 Your screens go here
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  bottomTab: undefined
+	CoursesDetails: undefined
+	StudentsDetails: undefined
+	// ManagementNavigator: undefined
+  ClassroomDetails: undefined
+	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 /**
@@ -58,7 +64,12 @@ const AppStack = observer(function AppStack() {
     >
           <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
       {/** 🔥 Your screens go here */}
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+      <Stack.Screen name="bottomTab" component={MainBottomTabNavigator} />
+			{/* <Stack.Screen name="ManagementNavigator" component={ManagementNavigator} /> */}
+			<Stack.Screen name="ClassroomDetails" component={Screens.ClassroomDetailsScreen} />
+			<Stack.Screen name="CoursesDetails" component={Screens.CoursesDetailsScreen} />
+			<Stack.Screen name="StudentsDetails" component={Screens.StudentsDetailsScreen} />
+			{/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>
   )
 })

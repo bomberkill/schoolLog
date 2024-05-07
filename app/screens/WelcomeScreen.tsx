@@ -1,83 +1,73 @@
+/* eslint-disable react-native/no-inline-styles */
 import { observer } from "mobx-react-lite"
 import React, { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import {TextStyle, View, ViewStyle } from "react-native"
 import {
+  Button,
+  Screen,
   Text,
-} from "app/components"
-import { isRTL } from "../i18n"
-import { AppStackScreenProps } from "../navigators"
-import { colors, spacing } from "../theme"
-import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+} from "../components"
+import { colors, spacing, typography } from "../theme"
+// import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import { AppStackScreenProps } from "app/navigators"
 
-const welcomeLogo = require("../../assets/images/logo.png")
-const welcomeFace = require("../../assets/images/welcome-face.png")
+// const logo = require("../../assets/images/Designer.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
-) {
+export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen({navigation}) {
 
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  // const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   return (
-    <View style={$container}>
+    <Screen statusBarStyle="dark" safeAreaEdges={["top", "bottom"]} style={$container} preset="fixed" >
       <View style={$topContainer}>
-        <Image style={$welcomeLogo} source={welcomeLogo} resizeMode="contain" />
         <Text
-          testID="welcome-heading"
-          style={$welcomeHeading}
-          tx="welcomeScreen.readyForLaunch"
           preset="heading"
+          size="xxl"
+          style={$welcomeHeading}
+          tx="welcomeScreen.welcomeMessage"
         />
-        <Text tx="welcomeScreen.exciting" preset="subheading" />
-        <Image style={$welcomeFace} source={welcomeFace} resizeMode="contain" />
+        <Text
+          style={$description}
+          tx="welcomeScreen.description"
+        />
+        <Button pressedStyle={{backgroundColor: colors.palette.blue200, opacity: 0.8 }} textStyle={$textButton} onPress={()=>navigation.navigate("bottomTab")} tx="welcomeScreen.textButton" style={$buttonStyle}/>
       </View>
-
-      <View style={[$bottomContainer, $bottomContainerInsets]}>
-        <Text tx="welcomeScreen.postscript" size="md" />
-      </View>
-    </View>
+    </Screen>
   )
 })
 
 const $container: ViewStyle = {
   flex: 1,
   backgroundColor: colors.background,
+  paddingHorizontal: spacing.lg,
+  justifyContent: "center",
 }
 
 const $topContainer: ViewStyle = {
-  flexShrink: 1,
-  flexGrow: 1,
-  flexBasis: "57%",
-  justifyContent: "center",
-  paddingHorizontal: spacing.lg,
-}
-
-const $bottomContainer: ViewStyle = {
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
-  justifyContent: "space-around",
-}
-const $welcomeLogo: ImageStyle = {
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-}
-
-const $welcomeFace: ImageStyle = {
-  height: 169,
-  width: 269,
-  position: "absolute",
-  bottom: -47,
-  right: -80,
-  transform: [{ scaleX: isRTL ? -1 : 1 }],
+  
 }
 
 const $welcomeHeading: TextStyle = {
+  marginVertical: spacing.xxl,
+  color: colors.palette.bleu100,
+  alignSelf: "center",
+}
+const $description: TextStyle = {
   marginBottom: spacing.md,
+  fontSize: spacing.md,
+  fontFamily: typography.fonts.courier.normal,
+}
+const $buttonStyle: ViewStyle = {
+  backgroundColor: colors.palette.blue200,
+  borderRadius: spacing.xxs,
+  padding: spacing.xxs,
+  marginBottom: spacing.sm,
+  marginTop: spacing.xxl,
+}
+const $textButton:TextStyle = {
+  color: colors.palette.neutral100,
+  fontSize: spacing.md,
+  fontWeight: "bold",
 }

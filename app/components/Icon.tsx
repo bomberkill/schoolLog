@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
   View,
-  ViewProps,
   ViewStyle,
 } from "react-native"
 
@@ -48,9 +47,8 @@ interface IconProps extends TouchableOpacityProps {
 /**
  * A component to render a registered icon.
  * It is wrapped in a <TouchableOpacity /> if `onPress` is provided, otherwise a <View />.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/components/Icon/}
- * @param {IconProps} props - The props for the `Icon` component.
- * @returns {JSX.Element} The rendered `Icon` component.
+ *
+ * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-Icon.md)
  */
 export function Icon(props: IconProps) {
   const {
@@ -63,16 +61,9 @@ export function Icon(props: IconProps) {
   } = props
 
   const isPressable = !!WrapperProps.onPress
-  const Wrapper = (WrapperProps?.onPress ? TouchableOpacity : View) as ComponentType<
-    TouchableOpacityProps | ViewProps
-  >
-
-  const $imageStyle: StyleProp<ImageStyle> = [
-    $imageStyleBase,
-    color !== undefined && { tintColor: color },
-    size !== undefined && { width: size, height: size },
-    $imageStyleOverride,
-  ]
+  const Wrapper: ComponentType<TouchableOpacityProps> = WrapperProps?.onPress
+    ? TouchableOpacity
+    : View
 
   return (
     <Wrapper
@@ -80,7 +71,15 @@ export function Icon(props: IconProps) {
       {...WrapperProps}
       style={$containerStyleOverride}
     >
-      <Image style={$imageStyle} source={iconRegistry[icon]} />
+      <Image
+        style={[
+          $imageStyle,
+          color && { tintColor: color },
+          size && { width: size, height: size },
+          $imageStyleOverride,
+        ]}
+        source={iconRegistry[icon]}
+      />
     </Wrapper>
   )
 }
@@ -91,16 +90,35 @@ export const iconRegistry = {
   caretLeft: require("../../assets/icons/caretLeft.png"),
   caretRight: require("../../assets/icons/caretRight.png"),
   check: require("../../assets/icons/check.png"),
+  clap: require("../../assets/icons/clap.png"),
+  community: require("../../assets/icons/community.png"),
+  components: require("../../assets/icons/components.png"),
+  debug: require("../../assets/icons/debug.png"),
+  github: require("../../assets/icons/github.png"),
+  heart: require("../../assets/icons/heart.png"),
   hidden: require("../../assets/icons/hidden.png"),
   ladybug: require("../../assets/icons/ladybug.png"),
   lock: require("../../assets/icons/lock.png"),
   menu: require("../../assets/icons/menu.png"),
   more: require("../../assets/icons/more.png"),
+  pin: require("../../assets/icons/pin.png"),
+  podcast: require("../../assets/icons/podcast.png"),
   settings: require("../../assets/icons/settings.png"),
+  slack: require("../../assets/icons/slack.png"),
   view: require("../../assets/icons/view.png"),
   x: require("../../assets/icons/x.png"),
+  home: require("../../assets/icons/home.png"),
+  classroom: require("../../assets/icons/workshop.png"),
+  course: require("../../assets/icons/e-learning.png"),
+  student: require("../../assets/icons/student.png"),
+  management: require("../../assets/icons/plan.png"),
+  empty: require("../../assets/icons/man.png"),
+  delete: require("../../assets/icons/trash.png"),
+  modify: require("../../assets/icons/pen-square.png"),
+  noSchedule: require("../../assets/icons/delete-event.png"),
+  attendance: require("assets/icons/attendance.png"),
 }
 
-const $imageStyleBase: ImageStyle = {
+const $imageStyle: ImageStyle = {
   resizeMode: "contain",
 }

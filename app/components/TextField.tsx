@@ -78,6 +78,8 @@ export interface TextFieldProps extends Omit<TextInputProps, "ref"> {
   /**
    * Style overrides for the container
    */
+  error?: string;
+
   containerStyle?: StyleProp<ViewStyle>
   /**
    * Style overrides for the input wrapper
@@ -99,9 +101,8 @@ export interface TextFieldProps extends Omit<TextInputProps, "ref"> {
 
 /**
  * A component that allows for the entering and editing of text.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/components/TextField/}
- * @param {TextFieldProps} props - The props for the `TextField` component.
- * @returns {JSX.Element} The rendered `TextField` component.
+ *
+ * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-TextField.md)
  */
 export const TextField = forwardRef(function TextField(props: TextFieldProps, ref: Ref<TextInput>) {
   const {
@@ -124,7 +125,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     inputWrapperStyle: $inputWrapperStyleOverride,
     ...TextInputProps
   } = props
-  const input = useRef<TextInput>(null)
+  const input = useRef<TextInput>()
 
   const disabled = TextInputProps.editable === false || status === "disabled"
 
@@ -145,7 +146,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     $inputWrapperStyleOverride,
   ]
 
-  const $inputStyles: StyleProp<TextStyle> = [
+  const $inputStyles = [
     $inputStyle,
     disabled && { color: colors.textDim },
     isRTL && { textAlign: "right" as TextStyle["textAlign"] },
@@ -159,16 +160,17 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     HelperTextProps?.style,
   ]
 
-  /**
-   *
-   */
   function focusInput() {
     if (disabled) return
 
     input.current?.focus()
   }
 
-  useImperativeHandle(ref, () => input.current as TextInput)
+  useImperativeHandle(ref, () => input.current)
+
+  const errorMessage = props.error ? (
+    <Text style={$errorText}>{props.error}</Text>
+ ) : null;
 
   return (
     <TouchableOpacity
@@ -194,7 +196,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
             style={$leftAccessoryStyle}
             status={status}
             editable={!disabled}
-            multiline={TextInputProps.multiline ?? false}
+            multiline={TextInputProps.multiline}
           />
         )}
 
@@ -203,7 +205,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           underlineColorAndroid={colors.transparent}
           textAlignVertical="top"
           placeholder={placeholderContent}
-          placeholderTextColor={colors.textDim}
+          placeholderTextColor={colors.border}
           {...TextInputProps}
           editable={!disabled}
           style={$inputStyles}
@@ -214,7 +216,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
             style={$rightAccessoryStyle}
             status={status}
             editable={!disabled}
-            multiline={TextInputProps.multiline ?? false}
+            multiline={TextInputProps.multiline}
           />
         )}
       </View>
@@ -229,12 +231,13 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           style={$helperStyles}
         />
       )}
+      {errorMessage}
     </TouchableOpacity>
   )
 })
 
 const $labelStyle: TextStyle = {
-  marginBottom: spacing.xs,
+  marginBottom: spacing.xxxs,
 }
 
 const $inputWrapperStyle: ViewStyle = {
@@ -250,7 +253,7 @@ const $inputWrapperStyle: ViewStyle = {
 const $inputStyle: TextStyle = {
   flex: 1,
   alignSelf: "stretch",
-  fontFamily: typography.primary.normal,
+  fontFamily: typography.primary.semiBold,
   color: colors.text,
   fontSize: 16,
   height: 24,
@@ -276,4 +279,8 @@ const $leftAccessoryStyle: ViewStyle = {
   height: 40,
   justifyContent: "center",
   alignItems: "center",
+}
+const $errorText:TextStyle = {
+  color: 'red',
+  fontFamily: typography.primary.semiBold,
 }

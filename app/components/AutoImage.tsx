@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from "react"
 import { Image, ImageProps, ImageURISource, Platform } from "react-native"
 
+// TODO: document new props
 export interface AutoImageProps extends ImageProps {
   /**
    * How wide should the image be?
@@ -20,13 +21,11 @@ export interface AutoImageProps extends ImageProps {
  * How is this different from `resizeMode: 'contain'`? Firstly, you can
  * specify only one side's size (not both). Secondly, the image will scale to fit
  * the desired dimensions instead of just being contained within its image-container.
- * @param {number} remoteUri - The URI of the remote image.
- * @param {number} dimensions - The desired dimensions of the image. If not provided, the original dimensions will be returned.
- * @returns {[number, number]} - The scaled dimensions of the image.
+ *
  */
 export function useAutoImage(
   remoteUri: string,
-  dimensions?: [maxWidth?: number, maxHeight?: number],
+  dimensions?: [maxWidth: number, maxHeight: number],
 ): [width: number, height: number] {
   const [[remoteWidth, remoteHeight], setRemoteImageDimensions] = useState([0, 0])
   const remoteAspectRatio = remoteWidth / remoteHeight
@@ -54,9 +53,8 @@ export function useAutoImage(
 
 /**
  * An Image component that automatically sizes a remote or data-uri image.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/components/AutoImage/}
- * @param {AutoImageProps} props - The props for the `AutoImage` component.
- * @returns {JSX.Element} The rendered `AutoImage` component.
+ *
+ * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-AutoImage.md)
  */
 export function AutoImage(props: AutoImageProps) {
   const { maxWidth, maxHeight, ...ImageProps } = props
