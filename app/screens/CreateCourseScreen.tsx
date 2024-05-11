@@ -60,14 +60,14 @@ export const CreateCourseScreen: FC<CreateCourseScreenProps> = observer(function
       <Formik
         initialValues={initialValues}
         validationSchema={validation}
-        onSubmit={(values, { resetForm }) => {
+        onSubmit={async (values, { resetForm }) => {
           const newId = `cr${String(dataStore.courses.length + 1).padStart(3, '0')}`;
           const newCourse: Course = {
             id: newId,
             credit: parseInt(values.credit),
             name: values.name
           };
-          dataStore.addCourse(newCourse);
+          await dataStore.addCourse(newCourse);
           console.log('Course ajouté :', newCourse);
           resetForm();
           navigation.navigate("CourseList");

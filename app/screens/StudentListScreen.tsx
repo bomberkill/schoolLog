@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, ImageStyle, ScrollView, StatusBar, TextStyle, View, ViewStyle } from 'react-native';
 import { ManagementNavigatorParamList } from 'app/navigators';
 import { Button, Icon, Text } from 'app/components';
@@ -8,10 +8,19 @@ import { translate } from 'app/i18n';
 import dataStore from 'app/data/data'; // Assurez-vous que le chemin est correct
 import { Appbar } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Student } from 'app/types/dataTypes';
 
 interface StudentListScreenProps extends NativeStackScreenProps<ManagementNavigatorParamList,"StudentList"> {}
 
 export const StudentListScreen: React.FC<StudentListScreenProps> = ({ navigation }) => {
+  const [students, setStudents] = useState<Student[]>([]);
+  useEffect(() => {
+    const loadStudents = async () => {
+      const loadedStudents = await dataStore.getStudents();
+      setStudents(loadedStudents);
+    };
+    loadStudents()
+  }, [students]);
  return (
     <View style={$root}>
       <StatusBar barStyle="dark-content"/>
@@ -20,9 +29,9 @@ export const StudentListScreen: React.FC<StudentListScreenProps> = ({ navigation
         <Appbar.Content title={translate("ManagementScreen.studentList")} color={colors.palette.blue200} titleStyle={{fontFamily: typography.primary.semiBold}} />
       </Appbar.Header>
       <ScrollView style={$container}>
-        {dataStore.students.length > 0 ? (
+        {students && students.length > 0 ? (
           <>
-            {dataStore.students.map((student, index) => {
+            {students.map((student, index) => {
               const image = student.photo === undefined ? student.gender === "male" ? require("../../assets/images/boy1.jpg") :
               require("../../assets/images/girl1.jpg") : {uri: student.photo}
               return (

@@ -2,7 +2,6 @@ import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import {
   ManagementScreen,
-  ClassroomDetailsScreen,
   ClassroomListScreen,
   StudentListScreen,
   CourseListScreen,
@@ -14,7 +13,6 @@ import {
 
 export type ManagementNavigatorParamList = {
   Management: undefined
-  ClassroomDetails: undefined
   ClassroomList: undefined
   StudentList: undefined
   CourseList: undefined
@@ -32,7 +30,6 @@ export const ManagementNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Management" component={ManagementScreen} />
-      <Stack.Screen name="ClassroomDetails" component={ClassroomDetailsScreen} />
       <Stack.Screen name="ClassroomList" component={ClassroomListScreen} />
       <Stack.Screen name="StudentList" component={StudentListScreen} />
       <Stack.Screen name="CourseList" component={CourseListScreen} />

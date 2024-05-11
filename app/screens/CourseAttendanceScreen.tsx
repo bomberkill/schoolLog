@@ -9,7 +9,7 @@ import { colors, spacing, typography } from "app/theme"
 import { Appbar } from "react-native-paper"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import dataStore from "app/data/data"
-import { Attendance, Student } from "app/types/dataTypes"
+import { Attendance, Classroom, Course, Student } from "app/types/dataTypes"
 import Toast from "react-native-toast-message"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
@@ -32,14 +32,54 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
     studentId: string;
     call: "present" | "absent";
   }
-  const prevIndex = dataStore.attendances.length > 0 ? 
-    Number(dataStore.attendances[dataStore.attendances.length - 1].id.split("_")[1]) : 0;
-    const newId = `attendance_${prevIndex + 1}`;
+  const [classrooms, setClassrooms] = useState<Classroom[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
+  const [attendances, setAttendances] = useState<Attendance[]>([])
   const [courseName, setCourseName] = useState<string>("")
   const [classroomName, setClassroomName] = useState<string>("")
   const [students, setStudents] = useState<Student[]>([])
-  // const [presDisabled, setPresDisabled] = useState(false)
-  // const [absDisabled, setAbsDisabled] = useState(false)
+  const [allStudents, setAllStudents] = useState<Student[]>([])
+  
+  const [calls, setCalls] = useState<callParam[]>([]);
+  useEffect(() => {
+    const loadClassrooms = async () => {
+      const loadedClassrooms = await dataStore.getClassrooms();
+      setClassrooms(loadedClassrooms);
+    };
+    const loadCourses = async () => {
+      const loadedCourses = await dataStore.getCourses();
+      setCourses(loadedCourses);
+    };
+    const loadStudents = async () => {
+      const loadedStudents = await dataStore.getStudents();
+      setAllStudents(loadedStudents);
+    };
+    const loadAttendances = async () => {
+      const loadedAttendances = await dataStore.getAttendances();
+      setAttendances(loadedAttendances);
+    };
+    loadAttendances()
+    loadClassrooms()
+    loadCourses()
+    loadStudents()
+  }, []);
+  useEffect(()=> {
+    setCourseName(courses.find(course => course.id === route.params.courseSchedule.courseId)?.name ?? "")
+    setClassroomName(classrooms.find(classe => classe.id === route.params.classroomId)?.name ?? "")
+    setStudents(allStudents.filter(student => student.classroomId === route.params.classroomId))
+    setCalls(allStudents.filter(student => student.classroomId === route.params.classroomId)
+    .map(student=> ({
+      studentId: student.id,
+      call: undefined,
+      isPresent: false,
+      isAbsent: false
+    }))
+    )
+  }, [courses, allStudents, classrooms])
+  
+  const prevIndex = attendances.length > 0 ? 
+    Number(attendances[attendances.length - 1].id.split("_")[1]) : 0;
+    const newId = `attendance_${prevIndex + 1}`;
   const attendance: Attendance = {
     id: newId,
     classroomId: route.params.classroomId,
@@ -53,20 +93,6 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
       }]
     }]
   }
-  const [calls, setCalls] = useState<callParam[]>([]);
-  useEffect(()=> {
-    setCourseName(dataStore.courses.find(course => course.id === route.params.courseSchedule.courseId)?.name ?? "")
-    setClassroomName(dataStore.classrooms.find(classe => classe.id === route.params.classroomId)?.name ?? "")
-    setStudents(dataStore.students.filter(student => student.classroomId === route.params.classroomId))
-    setCalls(dataStore.students.filter(student => student.classroomId === route.params.classroomId)
-    .map(student=> ({
-      studentId: student.id,
-      call: undefined,
-      isPresent: false,
-      isAbsent: false
-    }))
-    )
-  }, [])
   const markAttendance = (studentId: string, call: "present" | "absent") => {
     setCalls(prevCalls => prevCalls.map(item =>{
       if(item.studentId === studentId) {
@@ -81,7 +107,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
     }))
     console.log(`Student ${studentId} marked as ${call}`);
   };
-  const HandleSubmit = () => {
+  const HandleSubmit = async() => {
     if(calls.some(call=> call.call === undefined)) {
       Toast.show({
         type: 'info',
@@ -90,7 +116,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
         text2: translate("home.callError"),
       });
     } else {
-      const existingAttendance = dataStore.attendances.find(item=> 
+      const existingAttendance = attendances.find(item=> 
         item.classroomId === route.params.classroomId)
       if (existingAttendance) {
          const existingAttendanceSchedule = existingAttendance.classroomCall.find(item=> item.date === new Date().toLocaleDateString())?.courses.find(item=> item.courseScheduleId === route.params.courseSchedule.id)
@@ -105,7 +131,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
           const currentAttendance: callData[] = []
           calls.map(call=> currentAttendance.push({studentId: call.studentId, call: call.call as "present" | "absent"}))
           const filteredAttendance = currentAttendance.filter(item => item.call !== undefined);
-          dataStore.addAttendanceSchedule(
+          await dataStore.addAttendanceSchedule(
             route.params.classroomId, new Date().toLocaleDateString(),
             {courseScheduleId: route.params.courseSchedule.id, courseId: route.params.courseSchedule.courseId, attendance: filteredAttendance})
           Toast.show({
@@ -114,7 +140,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
             text1: translate("common.success"),
             text2: translate("CreateClassroom.successMessage"),
           });
-          console.log("dataStore.Attendance", dataStore.attendances)
+          console.log("dataStore.Attendance", attendances)
         }
       }else {
         const currentAttendance: callData[] = []
@@ -124,14 +150,14 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
           const filteredAttendance = currentAttendance.filter(item => item.call !== undefined);
           course.attendance = filteredAttendance;
           console.log("attendance", attendance)
-          dataStore.addAttendance(attendance)
+          await dataStore.addAttendance(attendance)
           Toast.show({
             type: 'success',
             position: 'bottom',
             text1: translate("common.success"),
             text2: translate("CreateClassroom.successMessage"),
           });
-          console.log("dataStore.Attendance", dataStore.attendances)
+          console.log("dataStore.Attendance", attendances)
         } else {
           // Handle the case where the course is not found
           console.error("Course not found");
@@ -150,10 +176,9 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
     <ScrollView style={$container}>
       {students.length > 0 ? (
         <>
-          <Text style={{fontFamily: typography.primary.semiBold}}>Classe: {classroomName}</Text>
-          <Text style={{fontFamily: typography.primary.semiBold}}>Cours: {courseName}</Text>
+          <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.classroom")} {classroomName}</Text>
+          <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.course")} {courseName}</Text>
           {students.map((student, index) => {
-            console.log("photo",student.photo)
             const image = student.photo === undefined ? student.gender === "male" ? require("../../assets/images/boy1.jpg") :
               require("../../assets/images/girl1.jpg") : {uri: student.photo}
             return (
@@ -164,7 +189,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
                     style={$studentPhoto}
                   />
                   <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start"}}>
-                    <Text style={$studentName}>{student.name}</Text>
+                    <Text numberOfLines={2} ellipsizeMode="tail" style={$studentName}>{student.name}</Text>
                     <Text style={$studentGender}>{translate(`CreateStudent.${student.gender}`)}</Text>
                   </View>
                   <View style={$attendanceOptions}>
@@ -172,7 +197,7 @@ export const CourseAttendanceScreen: FC<CourseAttendanceScreenProps> = observer(
                       style={[$attendanceButton, 
                         {backgroundColor: calls.find(call=> call.studentId === student.id)?.isPresent ? colors.errorBackground : colors.palette.success}]}
                     >
-                      <Text style={[$attendanceButtonText, {color : calls.find(call=> call.studentId === student.id)?.isPresent ? colors.palette.neutral700 : colors.palette.neutral100}]}>Présent</Text>
+                      <Text style={[$attendanceButtonText, {color : calls.find(call=> call.studentId === student.id)?.isPresent ? colors.palette.neutral700 : colors.palette.neutral100}]}>Present</Text>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.7} disabled={calls.find(call=> call.studentId === student.id)?.isPresent} onPress={() => markAttendance(student.id, "absent")} 
                       style={[$attendanceButton, 

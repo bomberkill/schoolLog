@@ -10,6 +10,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { Attendance, Classroom, Course, Student} from "app/types/dataTypes"
 import dataStore from "app/data/data"
 import { Dropdown, Icon, Text } from "app/components"
+import Spinner from "react-native-loading-spinner-overlay"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
@@ -25,15 +26,38 @@ export const AttendanceListScreen: FC<AttendanceListScreenProps> = observer(func
   const [students, setStudents] = useState<Student[]>([])
   const [courses , setCourses] = useState<Course[]>([])
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
+  const [isChecking, setIsChecking] = useState(false)
   const [firstClassroomId, setFirstClassroomId] = useState<string>("");
   const [selectedClassroom, setSelectedClassroom] = useState<string>("")
   const [selectedDate, setSelectedDate] = useState<string>("")
-  useEffect(()=> {
-    setAttendances(dataStore.attendances)
-    setStudents(dataStore.students)
-    setCourses(dataStore.courses)
-    setClassrooms(dataStore.classrooms)
-  }, [attendances]);
+
+  const loadStudents = async () => {
+    const loadedStudents = await dataStore.getStudents();
+    setStudents(loadedStudents);
+  };
+  const loadClassrooms = async () => {
+    const loadedClassrooms = await dataStore.getClassrooms();
+    setClassrooms(loadedClassrooms);
+  };
+  const loadCourses = async () => {
+    const loadedCourses = await dataStore.getCourses();
+    setCourses(loadedCourses);
+  };
+  const loadAttendances = async () => {
+    const loadedAttendances = await dataStore.getAttendances();
+    setAttendances(loadedAttendances);
+  };
+  useEffect(() => {
+    const getData = () => {
+      setIsChecking(true)
+      loadStudents()
+      loadAttendances()
+      loadClassrooms()
+      loadCourses()
+      setIsChecking(false)
+    }
+    getData()
+  }, [courses]);
   useEffect(() => {
     if (route.params?.classroomId) {
       setFirstClassroomId(route.params.classroomId);
@@ -62,6 +86,7 @@ export const AttendanceListScreen: FC<AttendanceListScreenProps> = observer(func
   return (
     <View style={$root}>
       <StatusBar barStyle="light-content"/>
+      <Spinner visible={isChecking} />
       <Appbar.Header style={{backgroundColor: colors.palette.blue200}}>
         {/* <Appbar.BackAction color={colors.palette.blue200} onPress={() => navigation.navigate('Management')} /> */}
         <Appbar.Content title={translate("attendanceList.headerText")} color={colors.palette.neutral100} titleStyle={{fontFamily: typography.primary.semiBold, alignSelf: "center"}} />
@@ -69,12 +94,14 @@ export const AttendanceListScreen: FC<AttendanceListScreenProps> = observer(func
         <ScrollView style={$container}>
           {attendances && attendances.length > 0 ? (
             <>
-              <Dropdown 
+              <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.selClass")}</Text>
+              <Dropdown
                 items={filteredClassrooms.map(classroom => ({label: classroom.name, value: classroom.id}))}
                 value={selectedClassroom}
                 onChangeText={(id)=> setSelectedClassroom(id)}
               />
-              <Dropdown 
+              <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.xs}}>{translate("attendanceList.selDate")}</Text>
+              <Dropdown
                 items={(filteredAttendances.find(att=> att.classroomId === selectedClassroom)?.classroomCall.map(day => ({label: day.date, value: day.date})) || [])}
                 value={selectedDate}
                 style={{display: "flex",justifyContent: "center", alignItems: "center"}}
@@ -82,7 +109,7 @@ export const AttendanceListScreen: FC<AttendanceListScreenProps> = observer(func
               />
               {attendances.find(att=> att.classroomId === selectedClassroom)?.classroomCall.find(call=> call.date === selectedDate)?.courses.map((item, index)=> (
                 <View key={index}>
-                  <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.sm}}>{courses.find(course=> course.id === item.courseId)?.name}</Text>
+                  <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.sm}}>{translate("attendanceList.course")} {courses.find(course=> course.id === item.courseId)?.name}</Text>
                   {item.attendance.map((attendance, key)=> {
                     const student = students.find(student=> student.id === attendance.studentId)
                     const image = student?.photo === undefined ? student?.gender === "male" ? require("../../assets/images/boy1.jpg") :

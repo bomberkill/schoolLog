@@ -129,6 +129,11 @@ const fr: Translations = {
   attendanceList: {
     headerText: "Historiques d'appels",
     noHistory: "Historique vide",
+    course: "Cours:",
+    classroom: "Classe:",
+    selClass: "Choisissez la classe:",
+    selDay: "Choisissez le jour:",
+    selDate: "Choisissez la date:",
   }
 }
 

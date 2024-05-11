@@ -19,7 +19,7 @@ if (__DEV__) {
 import "./i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
-import React from "react"
+import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore } from "./models"
@@ -31,6 +31,8 @@ import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
 import Toast from "react-native-toast-message"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import dataStore from "app/data/data"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -64,6 +66,26 @@ interface AppProps {
  * @param {AppProps} props - The props for the `App` component.
  * @returns {JSX.Element} The rendered `App` component.
  */
+const migrateDataToAsyncStorage = async () => {
+  try {
+     // Vérifier si les données ont déjà été migrées
+     const isDataMigrated = await AsyncStorage.getItem('@data_migrated');
+     if (isDataMigrated === null) {
+      // Stocker chaque tableau dans un élément AsyncStorage distinct
+      await AsyncStorage.setItem('@classrooms', JSON.stringify(dataStore.classrooms));
+      await AsyncStorage.setItem('@students', JSON.stringify(dataStore.students));
+      await AsyncStorage.setItem('@courses', JSON.stringify(dataStore.courses));
+      await AsyncStorage.setItem('@timeTables', JSON.stringify(dataStore.timeTables));
+      await AsyncStorage.setItem('@attendances', JSON.stringify(dataStore.attendances));
+
+      // Marquer la migration comme terminée
+      await AsyncStorage.setItem('@data_migrated', 'true');
+      console.log("data successfully migrated");
+    }
+  } catch (error) {
+    console.error('Erreur lors de la migration des données :', error);
+  }
+};
 function App(props: AppProps) {
   const { hideSplashScreen } = props
   const {
@@ -73,6 +95,9 @@ function App(props: AppProps) {
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
 
   const [areFontsLoaded] = useFonts(customFontsToLoad)
+  useEffect(() => {
+    migrateDataToAsyncStorage(); // Appeler la fonction de migration au lancement de l'application
+  }, []);
 
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
@@ -95,7 +120,7 @@ function App(props: AppProps) {
   const linking = {
     prefixes: [prefix],
     config,
-  }
+  } 
 
   // otherwise, we're ready to render the app
   return (

@@ -27,29 +27,39 @@ interface DaySchedule  {
 }
 export const CreateTimetableScreen: FC<CreateTimetableScreenProps> = observer(function CreateTimetableScreen({navigation, route}) {
   
-  const prevIndex = dataStore.timeTables.length > 0 ? 
-    Number(dataStore.timeTables[dataStore.timeTables.length - 1].id.split("_")[1]) : 0;
-    const newId = `timetable_${prevIndex + 1}`;
   const [courses, setCourses] = useState<Course[]>([])
+  const [timetables, setTimetables] = useState<Timetable[]>([])
+  
+  useEffect(() => {
+    const loadCourses = async () => {
+      const loadedCourses = await dataStore.getCourses();
+      if (loadedCourses.length <= 0) {
+        navigation.goBack()
+        Toast.show({
+          type: 'info',
+          position: 'bottom',
+          text1: translate("common.error"),
+          text2: translate("CreateTimetable.errorNoCourse"),
+        });
+      }else {
+        setCourses(loadedCourses);
+      }
+    };
+    const loadTimetables = async () => {
+      const loadedTimetables = await dataStore.getTimeTables();
+      setTimetables(loadedTimetables);
+    };
+    loadCourses()
+    loadTimetables()
+  }, [timetables]);
+ const prevIndex = timetables.length > 0 ? 
+    Number(timetables[timetables.length - 1].id.split("_")[1]) : 0;
+    const newId = `timetable_${prevIndex + 1}`;
   const timetable:Timetable = {
     id: newId,
     classroomId: route.params.classroomId ,
     daySchedule: []
   };
-
-  useEffect(() => {
-    if (dataStore.courses.length > 0) {
-      setCourses(dataStore.courses);
-    } else {
-      navigation.goBack()
-      Toast.show({
-        type: 'info',
-        position: 'bottom',
-        text1: translate("common.error"),
-        text2: translate("CreateTimetable.errorNoCourse"),
-      });
-    }
- }, [dataStore.classrooms]);
   interface dayParam {
     // day: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
     dayData: DaySchedule
@@ -111,9 +121,9 @@ export const CreateTimetableScreen: FC<CreateTimetableScreenProps> = observer(fu
   //   console.log("day active ",daysOfWeek)
   //  }, [daysOfWeek])
    useEffect(()=> {
-    console.log(" dataStore timetables", dataStore.timeTables[1]?.daySchedule.map(item=> item.coursesSchedule.map(it=> it.courseId)));
-    console.log("dataStore timetables length", dataStore.timeTables.length);
-   }, [dataStore.timeTables])
+    console.log(" dataStore timetables", timetables[1]?.daySchedule.map(item=> item.coursesSchedule.map(it=> it.courseId)));
+    console.log("dataStore timetables length", timetables.length);
+   }, [])
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
 
@@ -253,8 +263,8 @@ export const CreateTimetableScreen: FC<CreateTimetableScreenProps> = observer(fu
             if (onlyDaySchedule.length > 0) {
               console.log("debut push");
               onlyDaySchedule.map(day => timetable.daySchedule.push(day))
-              console.log("dataStore timetables avant", dataStore.timeTables.map((timetable) => console.log(timetable.daySchedule) ));
-              if(dataStore.timeTables.some(existing=> existing.classroomId === timetable.classroomId)) {
+              console.log("dataStore timetables avant", timetables.map((timetable) => console.log(timetable.daySchedule) ));
+              if(timetables.some(existing=> existing.classroomId === timetable.classroomId)) {
                 Toast.show({
                   type: 'info',
                   position: 'bottom',
@@ -262,9 +272,9 @@ export const CreateTimetableScreen: FC<CreateTimetableScreenProps> = observer(fu
                   text2: translate("CreateTimetable.existingTimetable"),
                 });
               }else {
-                dataStore.addTimetable(timetable);
+                await dataStore.addTimetable(timetable);
                 console.log("fin push");
-                console.log("dataStore timetables apres", dataStore.timeTables.map((timetable) => console.log(timetable.daySchedule) ));
+                console.log("dataStore timetables apres", timetables.map((timetable) => console.log(timetable.daySchedule) ));
                 navigation.navigate("Management")
                 Toast.show({
                   type: 'success',

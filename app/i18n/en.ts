@@ -87,8 +87,8 @@ const en = {
     title: "Create a timetable",
     errorNoCourse: "You must at least on course to add timetable",
     errorNoSchedule: "You must schedule at least on day of a week",
-    delProgram: "Delete this programme",
-    addProgram: "Add a programme",
+    delProgram: "Delete this program",
+    addProgram: "Add a program",
     saveProgram: "Save program",
     savedProgram: "Program saved and unmodifiable",
     slotOccupied: "This time slot is already occupied",
@@ -103,9 +103,9 @@ const en = {
       sunday: "Sunday",
     },
     validation: {
-      course: "Program required",
-      startTime: "Start time required",
-      endTime: "End time required",
+      course: "Program is required",
+      startTime: "Start is time required",
+      endTime: "End time is required",
       isAfter: "End time must be greater than start time",
     },
     form: {
@@ -126,6 +126,11 @@ const en = {
   attendanceList: {
     headerText: "Calls history",
     noHistory: "Empty history",
+    course: "Course:",
+    classroom: "classroom:",
+    selClass: "Select classroom:",
+    selDay: "Select the day:",
+    selDate: "Select the date:",
   }
 }
 

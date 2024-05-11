@@ -27,42 +27,28 @@ export const CreateStudentScreen: FC<CreateStudentScreenProps> = observer(functi
 
 
   useEffect(() => {
-     if (dataStore.classrooms.length > 0) {
-       setClassrooms(dataStore.classrooms);
-     } else {
-       navigation.goBack()
-       Toast.show({
-         type: 'info',
-         position: 'bottom',
-         text1: translate("common.error"),
-         text2: translate("CreateStudent.errorNoClassroom"),
-       });
-     }
-  }, [dataStore.classrooms]);
+    const loadClassrooms = async () => {
+      const loadedClassrooms = await dataStore.getClassrooms();
+      if (loadedClassrooms.length <= 0) {
+        navigation.goBack()
+        Toast.show({
+          type: 'info',
+          position: 'bottom',
+          text1: translate("common.error"),
+          text2: translate("CreateStudent.errorNoClassroom"),
+        });
+       }else {
+         setClassrooms(loadedClassrooms);
+       }
+    };
+    loadClassrooms()
+  }, []);
  
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
 
   // Pull in navigation via hook
   // const navigation = useNavigation()
-//   const handleSubmit = (values, { resetForm }) => {
-//     console.log('submit button')
-//     const newId = `st${String(dataStore.courses.length + 1).padStart(3, '0')}`;
-//     const newStudent = {
-//       id: newId, // Générer un nouvel ID
-//       ...values,
-//     };
-//     dataStore.addStudent(newStudent);
-//     console.log('Étudiant ajouté :', newStudent);
-//     resetForm();
-//     navigation.navigate("StudentList");
-//     Toast.show({
-//       type: 'success',
-//       position: 'bottom',
-//       text1: translate("common.success"),
-//       text2: translate("CreateClassroom.successMessage"),
-//     });
-//  };
 
  const validation = Yup.object().shape({
     name: Yup.string().required(translate("CreateStudent.validation.name")),
@@ -111,7 +97,7 @@ export const CreateStudentScreen: FC<CreateStudentScreenProps> = observer(functi
         <Formik
           initialValues={initialValues}
           validationSchema={validation}
-          onSubmit={(values, { resetForm }) => {
+          onSubmit={async (values, { resetForm }) => {
             console.log('submit button')
             const newId = `st${String(dataStore.courses.length + 1).padStart(3, '0')}`;
             const newStudent: Student = {
@@ -121,7 +107,7 @@ export const CreateStudentScreen: FC<CreateStudentScreenProps> = observer(functi
               name: values.name,
               photo: values.photo
             };
-            dataStore.addStudent(newStudent);
+            await dataStore.addStudent(newStudent);
             console.log('Étudiant ajouté :', newStudent);
             resetForm();
             navigation.navigate("StudentList");

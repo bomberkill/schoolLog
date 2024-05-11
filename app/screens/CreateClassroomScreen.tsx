@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
-import { TextStyle, View, ViewStyle } from "react-native"
+import { StatusBar, TextStyle, View, ViewStyle } from "react-native"
 import { ManagementNavigatorParamList } from "app/navigators"
 import { Button, Screen, TextField } from "app/components"
 import { Appbar } from "react-native-paper"
@@ -34,6 +34,7 @@ export const CreateClassroomScreen: FC<CreateClassroomScreenProps> = observer(fu
 
   return (
     <Screen style={$root} preset="scroll">
+      <StatusBar barStyle="dark-content"/>
       <Appbar.Header>
         <Appbar.BackAction color={colors.palette.blue200} onPress={() => navigation.goBack()} />
         <Appbar.Content title={translate("ManagementScreen.addClass")} color={colors.palette.blue200} titleStyle={{fontFamily: typography.primary.semiBold}} />
@@ -41,13 +42,13 @@ export const CreateClassroomScreen: FC<CreateClassroomScreenProps> = observer(fu
       <Formik
         initialValues={initialValues}
         validationSchema={validation}
-        onSubmit={(values, {resetForm}) => {
+        onSubmit={async (values, {resetForm}) => {
           const newId = `cl${String(dataStore.classrooms.length + 1).padStart(3, '0')}`
           const newClassroom = {
             id: newId, // Générer un nouvel ID
             ...values,
           };
-          dataStore.addClassroom(newClassroom);
+          await dataStore.addClassroom(newClassroom);
           console.log('Classroom ajouté :', newClassroom);
           resetForm()
           navigation.navigate("ClassroomList");

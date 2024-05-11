@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { ScrollView, StatusBar, TextStyle, View, ViewStyle } from "react-native"
 import { ManagementNavigatorParamList } from "app/navigators"
@@ -9,6 +9,7 @@ import { colors, typography, spacing } from "app/theme"
 import { Appbar } from "react-native-paper"
 import dataStore from "app/data/data"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { Course } from "app/types/dataTypes"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
@@ -20,6 +21,14 @@ export const CourseListScreen: FC<CourseListScreenProps> = observer(function Cou
 
   // Pull in navigation via hook
   // const navigation = useNavigation()
+  const [courses, setCourses] = useState<Course[]>([]);
+  useEffect(() => {
+    const loadCourses = async () => {
+      const loadedCourses = await dataStore.getCourses();
+      setCourses(loadedCourses);
+    };
+    loadCourses()
+  }, [courses]);
   return (
     <View style={$root}>
       <StatusBar barStyle="dark-content"/>
@@ -28,9 +37,9 @@ export const CourseListScreen: FC<CourseListScreenProps> = observer(function Cou
         <Appbar.Content title={translate("ManagementScreen.courseList")} color={colors.palette.blue200} titleStyle={{fontFamily: typography.primary.semiBold}} />
       </Appbar.Header>
       <ScrollView style={$container}>
-        {dataStore.classrooms.length > 0 ? (
+        {courses && courses.length > 0 ? (
           <>
-            {dataStore.courses.map((course, index)=> (
+            {courses.map((course, index)=> (
               <View style={$itemStyle} key={index}>
                 <View>
                   <Text style={$nameStyle} text={course.name}/>

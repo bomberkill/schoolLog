@@ -18,6 +18,7 @@ import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import {MainBottomTabNavigator} from "app/navigators"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -36,10 +37,6 @@ export type AppStackParamList = {
   Welcome: undefined
   // 🔥 Your screens go here
   bottomTab: undefined
-	CoursesDetails: undefined
-	StudentsDetails: undefined
-	// ManagementNavigator: undefined
-  ClassroomDetails: undefined
 	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -53,6 +50,19 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
   AppStackParamList,
   T
 >
+const [isFirstLaunch, setIsFirstLaunch] = React.useState(true);
+
+React.useEffect(()=> {
+  const handleLaunch = async ()=> {
+    const hasLaunched = await AsyncStorage.getItem("hasLaunched")
+    if(hasLaunched === null) {
+      await AsyncStorage.setItem("hasLaunched", "true")
+    } else {
+      setIsFirstLaunch(false)
+    }
+  }
+  handleLaunch()
+}, [])
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<AppStackParamList>()
@@ -62,13 +72,11 @@ const AppStack = observer(function AppStack() {
     <Stack.Navigator
       screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
     >
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+      {isFirstLaunch && (
+        <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+      )}
       {/** 🔥 Your screens go here */}
       <Stack.Screen name="bottomTab" component={MainBottomTabNavigator} />
-			{/* <Stack.Screen name="ManagementNavigator" component={ManagementNavigator} /> */}
-			<Stack.Screen name="ClassroomDetails" component={Screens.ClassroomDetailsScreen} />
-			<Stack.Screen name="CoursesDetails" component={Screens.CoursesDetailsScreen} />
-			<Stack.Screen name="StudentsDetails" component={Screens.StudentsDetailsScreen} />
 			{/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>
   )

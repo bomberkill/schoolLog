@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { ScrollView, StatusBar, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { ManagementNavigatorParamList } from "app/navigators"
@@ -10,6 +10,7 @@ import { translate } from "app/i18n"
 import dataStore from "app/data/data"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import Toast from "react-native-toast-message"
+import { Classroom, Timetable } from "app/types/dataTypes"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
@@ -21,6 +22,21 @@ export const ClassroomListScreen: FC<ClassroomListScreenProps> = observer(functi
 
   // Pull in navigation via hook
   // const navigation = useNavigation()
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [timetables, setTimetables] = useState<Timetable[]>([]);
+  useEffect(() => {
+    const loadClassrooms = async () => {
+      const loadedClassrooms = await dataStore.getClassrooms();
+      setClassrooms(loadedClassrooms);
+    };
+    const loadTimetables = async () => {
+      const loadedTimetables = await dataStore.getTimeTables();
+      setTimetables(loadedTimetables);
+    };
+    loadClassrooms();
+    loadTimetables()
+ }, [classrooms]);
+
   return (
     <View style={$root}>
       <StatusBar barStyle="dark-content"/>
@@ -29,13 +45,13 @@ export const ClassroomListScreen: FC<ClassroomListScreenProps> = observer(functi
         <Appbar.Content title={translate("ManagementScreen.classroomList")} color={colors.palette.blue200} titleStyle={{fontFamily: typography.primary.semiBold}} />
       </Appbar.Header>
       <ScrollView style={$container}>
-        {dataStore.classrooms.length > 0 ? (
+        {classrooms && classrooms.length > 0 ? (
           <>
-            {dataStore.classrooms.map((classroom, index)=> (
+            {classrooms.map((classroom, index)=> (
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={()=>{
-                  if(dataStore.timeTables.find(existing=> existing.classroomId === classroom.id)) {
+                  if(timetables && timetables.find(existing=> existing.classroomId === classroom.id)) {
                     Toast.show({
                       type: 'info',
                       position: 'bottom',

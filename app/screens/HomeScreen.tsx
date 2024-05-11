@@ -9,9 +9,10 @@ import { Appbar } from "react-native-paper"
 import { translate } from "app/i18n"
 import dataStore from "app/data/data"
 import Toast from "react-native-toast-message"
-import { Classroom, Course, Timetable } from "app/types/dataTypes"
+import { Attendance, Classroom, Course, Timetable } from "app/types/dataTypes"
 import I18n from "i18n-js"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import Spinner from "react-native-loading-spinner-overlay"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
@@ -26,14 +27,40 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen({nav
   const [timetables, setTimeTables] = useState<Timetable[]>([])
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [courses, setCourses] = useState<Course[]>([])
+  const [isChecking, setIsChecking] = useState(false)
+  const [attendances, setAttendances] = useState<Attendance[]>([])
   const [firstClassroomId, setFirstClassroomId] = useState<string>("");
   const [selectedClassroom, setSelectedClassroom] = useState<string>("")
   const [selectedDay, setSelectedDay] = useState<string>("");
+  const loadTimetables = async () => {
+    const loadedTimeTables = await dataStore.getTimeTables();
+    setTimeTables(loadedTimeTables);
+  };
+  const loadClassrooms = async () => {
+    const loadedClassrooms = await dataStore.getClassrooms();
+    setClassrooms(loadedClassrooms);
+  };
+  const loadCourses = async () => {
+    const loadedCourses = await dataStore.getCourses();
+    setCourses(loadedCourses);
+  };
+  const loadAttendances = async () => {
+    const loadedAttendances = await dataStore.getAttendances();
+    setAttendances(loadedAttendances);
+  };
   useEffect(() => {
-    setTimeTables(dataStore.timeTables);
-    setClassrooms(dataStore.classrooms)
-    setCourses(dataStore.courses)
-}, [dataStore.classrooms]);
+    setIsChecking(true)
+    const getData = () => {
+      console.log('start', isChecking)
+      loadAttendances()
+      loadClassrooms()
+      loadTimetables()
+      loadCourses()
+    }
+    getData()
+    setIsChecking(false)
+    console.log('end', isChecking)
+  }, []);
 
   useEffect(() => {
     if (timetables.length > 0) {
@@ -105,6 +132,7 @@ if (dayMatch) {
   return (
     <View style={$root}>
       <StatusBar barStyle="light-content"/>
+      <Spinner color={colors.errorBackground} visible={isChecking} />
       <Appbar.Header style={{backgroundColor: colors.palette.blue200}}>
       {/* <Appbar.BackAction color={colors.palette.blue200} onPress={() => navigation.goBack()} /> */}
       <Appbar.Content title={translate("common.home")} color={colors.palette.neutral100} titleStyle={{fontFamily: typography.primary.semiBold, alignSelf: "center"}} />
@@ -112,12 +140,14 @@ if (dayMatch) {
     <ScrollView style={$container}>
       {timetables && timetables.length > 0 ? (
         <>
+          <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.selClass")}</Text>
           <Dropdown 
             items={filteredClassrooms.map(classroom => ({label: classroom.name, value: classroom.id}))}
             value={selectedClassroom}
             onChangeText={(id)=> setSelectedClassroom(id)}
           />
-          <Dropdown 
+          <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.xs}}>{translate("attendanceList.selDay")}</Text>
+          <Dropdown
             items={["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map(day => ({label: dayOfWeekTranslations[day as keyof typeof dayOfWeekTranslations], value: day}))}
             value={selectedDay}
             style={{display: "flex",justifyContent: "center", alignItems: "center"}}
@@ -134,7 +164,7 @@ if (dayMatch) {
                           <TouchableOpacity
                             onPress={() => {
                               if (isProgramInProgress(schedule.startTime, schedule.endTime, day.day)) {
-                                const existingAttendance = dataStore.attendances.find(item=> 
+                                const existingAttendance = attendances.find(item=> 
                                   item.classroomId === selectedClassroom)
                                 if (existingAttendance) {
                                   const existingAttendanceSchedule = existingAttendance.classroomCall.find(item=> item.date === new Date().toLocaleDateString())?.courses.find(item=> item.courseScheduleId === schedule.id)
@@ -183,11 +213,15 @@ if (dayMatch) {
                           </TouchableOpacity>
                         </View>
                       ))
-                    :
-                      <View style={$emptyStyle}>
-                        <Icon icon="noSchedule" size={200}/>
-                        <Text style={$emptyText} tx="home.noSchedule"/>
-                      </View>
+                    : 
+                      <>
+                      {isChecking !== true && (
+                        <View style={$emptyStyle}>
+                          <Icon icon="noSchedule" size={200}/>
+                          <Text style={$emptyText} tx="home.noSchedule"/>
+                        </View>
+                      )}
+                      </>
                     }
                   </View>
                 )
