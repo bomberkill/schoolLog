@@ -140,13 +140,13 @@ if (dayMatch) {
     <ScrollView style={$container}>
       {timetables && timetables.length > 0 ? (
         <>
-          <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.selClass")}</Text>
+          {/* <Text style={{fontFamily: typography.primary.semiBold}}>{translate("attendanceList.selClass")}</Text> */}
           <Dropdown 
             items={filteredClassrooms.map(classroom => ({label: classroom.name, value: classroom.id}))}
             value={selectedClassroom}
             onChangeText={(id)=> setSelectedClassroom(id)}
           />
-          <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.xs}}>{translate("attendanceList.selDay")}</Text>
+          {/* <Text style={{fontFamily: typography.primary.semiBold, marginTop: spacing.xs}}>{translate("attendanceList.selDay")}</Text> */}
           <Dropdown
             items={["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map(day => ({label: dayOfWeekTranslations[day as keyof typeof dayOfWeekTranslations], value: day}))}
             value={selectedDay}

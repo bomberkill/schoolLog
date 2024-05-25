@@ -134,6 +134,12 @@ const fr: Translations = {
     selClass: "Choisissez la classe:",
     selDay: "Choisissez le jour:",
     selDate: "Choisissez la date:",
+  },
+  Auth: {
+    noBiometric: "Cet appareil ne prend pas en charge l'authentification biometrique.",
+    title: "Securiser vos données en ajoutant un moyen d'authentification",
+    useWeakBio: "Utiliser le moyen de verouillage actuel de l'appareil",
+    useStrongBio: "Ajouter un moyen d'authentifiation biometrique",
   }
 }
 

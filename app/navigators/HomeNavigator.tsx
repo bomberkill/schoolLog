@@ -24,7 +24,7 @@ export type HomeNavigatorParamList = {
 const Stack = createNativeStackNavigator<HomeNavigatorParamList>()
 export const HomeNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator  initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="CourseAttendance" component={CourseAttendanceScreen} />
       <Stack.Screen name="AttendanceNavigator" component={AttendanceNavigator} />

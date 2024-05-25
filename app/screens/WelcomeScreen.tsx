@@ -32,7 +32,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
           style={$description}
           tx="welcomeScreen.description"
         />
-        <Button pressedStyle={{backgroundColor: colors.palette.blue200, opacity: 0.8 }} textStyle={$textButton} onPress={()=>navigation.navigate("bottomTab")} tx="welcomeScreen.textButton" style={$buttonStyle}/>
+        <Button pressedStyle={{backgroundColor: colors.palette.blue200, opacity: 0.8 }} textStyle={$textButton} onPress={()=>navigation.navigate("Auth")} tx="welcomeScreen.textButton" style={$buttonStyle}/>
       </View>
     </Screen>
   )

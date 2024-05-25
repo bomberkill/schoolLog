@@ -131,7 +131,13 @@ const en = {
     selClass: "Select classroom:",
     selDay: "Select the day:",
     selDate: "Select the date:",
-  }
+  },
+  Auth: {
+    noBiometric: "This device does not support biometric authentication.",
+    title: "Secure your data by adding an authentication method",
+    useWeakBio: "Use the current device lock method",
+    useStrongBio: "Add a biometric authentication method",
+}
 }
 
 export default en
