@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
+import React, { FC, useEffect } from "react"
 import {TextStyle, View, ViewStyle } from "react-native"
 import {
   Button,
@@ -10,12 +10,23 @@ import {
 import { colors, spacing, typography } from "../theme"
 // import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { AppStackScreenProps } from "app/navigators"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 // const logo = require("../../assets/images/Designer.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen({navigation}) {
+
+  const checkfirstlaunch = async ()=> {
+    const isFirstLaunch = await AsyncStorage.getItem("hasLaunched")
+    if (isFirstLaunch) {
+      navigation.navigate("Auth")
+    }
+  }
+  useEffect(()=> {
+    checkfirstlaunch()
+  },[])
 
   // const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
@@ -32,7 +43,13 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
           style={$description}
           tx="welcomeScreen.description"
         />
-        <Button pressedStyle={{backgroundColor: colors.palette.blue200, opacity: 0.8 }} textStyle={$textButton} onPress={()=>navigation.navigate("Auth")} tx="welcomeScreen.textButton" style={$buttonStyle}/>
+        <Button pressedStyle={{backgroundColor: colors.palette.blue200, opacity: 0.8 }} textStyle={$textButton} 
+          onPress={()=>{
+            console.log("next button")
+            navigation.navigate("SetPinStep1")
+          }}
+          tx="welcomeScreen.textButton" style={$buttonStyle}
+        />
       </View>
     </Screen>
   )

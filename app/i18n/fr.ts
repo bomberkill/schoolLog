@@ -12,7 +12,7 @@ const fr: Translations = {
     success: "Succès",
     sorry: "Désole",
     attendance: "Presence",
-    attendanceBottom: "Appel",
+    attendanceBottom: "fiche de presence",
   },
   welcomeScreen: {
     postscript:
@@ -127,7 +127,7 @@ const fr: Translations = {
     callDone: "L'appel a déjà été effectuée sur ce programme",
   },
   attendanceList: {
-    headerText: "Historiques d'appels",
+    headerText: "Historique de presence",
     noHistory: "Historique vide",
     course: "Cours:",
     classroom: "Classe:",
@@ -137,10 +137,18 @@ const fr: Translations = {
   },
   Auth: {
     noBiometric: "Cet appareil ne prend pas en charge l'authentification biometrique.",
-    title: "Securiser vos données en ajoutant un moyen d'authentification",
+    title: "Deverouiller votre application pour pouvoir l'utiliser",
     useWeakBio: "Utiliser le moyen de verouillage actuel de l'appareil",
     useStrongBio: "Ajouter un moyen d'authentifiation biometrique",
-  }
+    header: "Authentification",
+  },
+  setPinStep1: {
+    Title: "Sécurisez vos données en ajoutant un code PIN de 4 chiffres",
+    header: "Ajouter un code PIN",
+  },
+  setPinStep2: {
+    Title: "Confirmer votre code PIN",
+  },
 }
 
 export default fr

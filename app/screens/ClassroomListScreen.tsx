@@ -60,6 +60,12 @@ export const ClassroomListScreen: FC<ClassroomListScreenProps> = observer(functi
                     });
                   }else {
                     navigation.navigate("CreateTimetable", {classroomId: classroom.id})
+                    // Toast.show({
+                    //   type: 'info',
+                    //   position: 'bottom',
+                    //   text1: translate("common.sorry"),
+                    //   text2: "create timtable screen is not ready",
+                    // });
                   }
                 }}
                 style={$itemStyle}
@@ -86,7 +92,15 @@ export const ClassroomListScreen: FC<ClassroomListScreenProps> = observer(functi
           textStyle={$textButton} 
           tx="ManagementScreen.addClass" 
           style={$buttonStyle}
-          onPress={()=>navigation.navigate("CreateClassroom")}
+          onPress={()=>{
+            navigation.navigate("CreateClassroom")
+            // Toast.show({
+            //   type: 'info',
+            //   position: 'bottom',
+            //   text1: translate("common.sorry"),
+            //   text2: "create classroom screen is not ready",
+            // });
+          }}
         />
       </ScrollView>
     </View>

@@ -117,6 +117,8 @@ export const iconRegistry = {
   modify: require("../../assets/icons/pen-square.png"),
   noSchedule: require("../../assets/icons/delete-event.png"),
   attendance: require("assets/icons/attendance.png"),
+  fingerprint: require("assets/icons/fingerprint-scan.png"),
+  numdel: require("assets/icons/delete.png"),
 }
 
 const $imageStyle: ImageStyle = {

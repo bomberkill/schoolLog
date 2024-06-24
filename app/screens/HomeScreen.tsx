@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { ScrollView, StatusBar, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+import { ScrollView, StatusBar, TextStyle, TouchableOpacity, View, ViewStyle, BackHandler } from "react-native"
 import { HomeNavigatorParamList } from "app/navigators"
 import { Dropdown, Icon, Text } from "app/components"
 import { colors, spacing, typography } from "app/theme"
@@ -24,6 +24,14 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen({nav
   
   // Pull in navigation via hook
   // const navigation = useNavigation()
+  useEffect(()=> {
+    const BackAction = () => {
+      BackHandler.exitApp()
+      return true;
+    }
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", BackAction);
+    return () => backHandler.remove()
+  },[])
   const [timetables, setTimeTables] = useState<Timetable[]>([])
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [courses, setCourses] = useState<Course[]>([])
@@ -183,6 +191,12 @@ if (dayMatch) {
                                     courseSchedule: schedule,
                                     day: selectedDay,
                                   });
+                                  // Toast.show({
+                                  //   type: 'info',
+                                  //   position: 'bottom',
+                                  //   text1: translate("common.sorry"),
+                                  //   text2: "create attendance screen is not ready",
+                                  // });
                                 }
                               } else {
                                  Toast.show({

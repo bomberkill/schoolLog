@@ -1,63 +1,43 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { StatusBar, TouchableOpacity, View, ViewStyle } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import {Icon, IconTypes, Text } from "app/components"
+import { Icon, IconTypes, Text } from "app/components"
 import { colors, spacing, typography } from "app/theme"
 import { translate } from "app/i18n"
 import { Appbar } from "react-native-paper"
-import RNBiometrics from 'react-native-biometrics';
 import AsyncStorage from "@react-native-async-storage/async-storage"
-// import AsyncStorage from "@react-native-async-storage/async-storage"
-interface AuthScreenProps extends AppStackScreenProps<"Auth"> {}
+// import { useNavigation } from "@react-navigation/native"
+// import { useStores } from "app/models"
 
-export const AuthScreen: FC<AuthScreenProps> = observer(function AuthScreen({ navigation }) {
-  const [isBiometric, setIsBiometric] = useState(false);
+interface SetPinStep2ScreenProps extends AppStackScreenProps<"SetPinStep2"> {}
+
+export const SetPinStep2Screen: FC<SetPinStep2ScreenProps> = observer(function SetPinStep2Screen({navigation, route}) {
   const [pinCode, setPincode] = useState('');
-  const [correctPin, setCorrectPin] =useState("");
+  const correctPin = route.params.pinCodeSet;
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
 
   // Pull in navigation via hook
   // const navigation = useNavigation()
-  const handleBiometricAuth = async () => {
-     const biometrics = new RNBiometrics({allowDeviceCredentials: true})
-     const pin = await AsyncStorage.getItem("savedPinCode")
-     if (pin) {
-       setCorrectPin(pin)
-     }
-     try {
-       const { biometryType, available, error } = await biometrics.isSensorAvailable()
-       if(available) {
-        setIsBiometric(true)
-        console.log("bioType types values: ", biometryType)
-      }else {
-        console.log("bioType error value: ", error)
-      }
-     } catch (error) {
-      console.log("error occured ", error)
-    }
-  };
-  // const createKey = await biometrics.createKeys()
-  // AsyncStorage.setItem('biometricPubliKey', createKey.publicKey)
-  // console.log('Biometrics saved successfully', createKey.publicKey)
-  // const payload = 'authentication payload';
-  // const { success, signature } = await biometrics.createSignature({ promptMessage: 'Authenticate', payload });
-  // if(success) {
-  //   console.log("signature: ", signature)
-  // }
-  const addDigit =  (num: number) => {
+  const addDigit = async  (num: number) => {
     const actualPin = pinCode + num.toString();
     setPincode(actualPin);
     if (pinCode.length === 3) {
-      console.log('pinCode and actualPin',pinCode, actualPin)
+      console.log('pinCode and actualPin',correctPin, actualPin)
       if (actualPin === correctPin) {
         console.log("PIN code matched");
-        console.log('pinCode and actual',pinCode, actualPin)
+        console.log('pinCode and actual',correctPin, actualPin)
+        await AsyncStorage.setItem("savedPinCode", actualPin);
+        setSuccessMessage("PIN code successfully saved")
+        await AsyncStorage.setItem("hasLaunched", "true");
+        console.log("firstlaunch save successfully");
         navigation.navigate('bottomTab')
         setTimeout(()=>setPincode(""), 1000);
+        setTimeout(()=>setSuccessMessage(""), 1000);
       }else {
         console.log("PIN code do not match")
         setErrorMessage("PIN code do not match");
@@ -71,44 +51,21 @@ export const AuthScreen: FC<AuthScreenProps> = observer(function AuthScreen({ na
       setPincode(prevPin=> prevPin.slice(0, -1));
     }
   }
+  const data = [{num: [1, 2, 3]}, {num: [4, 5, 6]}, {num: [7, 8, 9]}, {num: [undefined, 0, "numdel"]}];
   const maskedCode = ' * '.repeat(pinCode.length);
-
-  const auth = async () => {
-    const biometrics = new RNBiometrics({allowDeviceCredentials: true})
-    try {
-      const simplePrompt = await biometrics.simplePrompt({
-        promptMessage: 'Sign in with Touch ID',
-        cancelButtonText: 'Close',
-        fallbackPromptMessage: 'too many attempts , use pin code instead'
-      });
-      if (simplePrompt.success) {
-        navigation.navigate('bottomTab')
-      }
-      console.log("simple prompt",simplePrompt.success, simplePrompt.error);
-    } catch (error) {
-      console.log('error on try catch', error)
-    }
-  }
-  useEffect(()=> {
-    console.log("useEffect start");
-    handleBiometricAuth()
-  }, [])
-  const data = [{num: [1, 2, 3]}, {num: [4, 5, 6]}, {num: [7, 8, 9]}, {num: [isBiometric? "fingerprint" : undefined, 0, "numdel"]}];
   return (
     <View style={$root}>
       <StatusBar barStyle="light-content"/>
       <Appbar.Header style={{backgroundColor: colors.palette.blue200}}>
-        <Appbar.Content title={translate("Auth.header")} color={colors.palette.neutral100} titleStyle={{fontFamily: typography.primary.semiBold, alignSelf: "center"}} />
+        <Appbar.Content title={translate("setPinStep1.header")} color={colors.palette.neutral100} titleStyle={{fontFamily: typography.primary.semiBold, alignSelf: "center"}} />
       </Appbar.Header>
       <View style={$container}>
-        {/* {!isBiometric &&
-          <Text style={{fontFamily: typography.primary.semiBold, color: colors.palette.angry500}}>{translate("Auth.noBiometric")}</Text>
-        } */}
-        <Text style={{fontFamily: typography.primary.semiBold}}>{translate("Auth.title")}</Text>
+        <Text style={{fontFamily: typography.primary.semiBold}}>{translate("setPinStep2.Title")}</Text>
         <View style={$pinDisplay}>
           <Text weight="bold" size="xl" style={{color: colors.palette.blue200}}>{maskedCode}</Text>
           <View style={{marginBottom: spacing.sm, borderBottomColor: colors.palette.neutral900, borderBottomWidth: 1, width: 100}}></View>
           <Text weight="bold" size="sm" style={{color: colors.palette.angry500}}>{errorMessage}</Text>
+          <Text weight="bold" size="sm" style={{color: colors.palette.success}}>{successMessage}</Text>
         </View>
         <View style={$numView}>
           {data.map((item, index) => (
@@ -123,12 +80,7 @@ export const AuthScreen: FC<AuthScreenProps> = observer(function AuthScreen({ na
                     <TouchableOpacity onPress={removeLastDigit} style={[$numberStyle, {backgroundColor: colors.palette.neutral100}]} key={key}>
                       <Icon color={colors.palette.blue200} size={spacing.lg} icon={num as IconTypes} />
                     </TouchableOpacity>
-                  ) : num === 'fingerprint' ? (
-                    <View style={$numberStyle}>
-                      <Icon onPress={auth} color={colors.palette.blue200} size={spacing.xxl} icon={num as IconTypes} />
-                    </View>
-                  ) 
-                  : (<View style={$numberStyle}></View>)
+                  ) :(<View style={$numberStyle}></View>)
                   }
                 </View>
               ))}

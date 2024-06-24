@@ -9,6 +9,7 @@ import dataStore from 'app/data/data'; // Assurez-vous que le chemin est correct
 import { Appbar } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Student } from 'app/types/dataTypes';
+// import Toast from 'react-native-toast-message';
 
 interface StudentListScreenProps extends NativeStackScreenProps<ManagementNavigatorParamList,"StudentList"> {}
 
@@ -62,7 +63,15 @@ export const StudentListScreen: React.FC<StudentListScreenProps> = ({ navigation
           textStyle={$textButton} 
           tx="ManagementScreen.addStudent" 
           style={$buttonStyle}
-          onPress={()=>navigation.navigate("CreateStudent")}
+          onPress={()=>{
+            navigation.navigate("CreateStudent")
+            // Toast.show({
+            //   type: 'info',
+            //   position: 'bottom',
+            //   text1: translate("common.sorry"),
+            //   text2: "create student screen is not ready",
+            // });
+          }}
         />
       </ScrollView>
     </View>

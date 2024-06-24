@@ -10,7 +10,7 @@ const en = {
     success: "Success",
     sorry: "Sorry",
     attendance: "Attendance",
-    attendanceBottom: "Call",
+    attendanceBottom: "Attendance sheet",
   },
   welcomeScreen: {
     postscript:
@@ -39,7 +39,7 @@ const en = {
     addCourse: "Add course",
     addStudent: "Add student",
     courseLabel: "Courses",
-    classroomLabel: "Classrooms",
+    classroomLabel: "Streams",
     studentLabel: "Students",
     managementText: "Management",
     classroomList: "Classrooms list",
@@ -124,7 +124,7 @@ const en = {
     callDone: "Attendance was already done for this schedule",
   },
   attendanceList: {
-    headerText: "Calls history",
+    headerText: "Attendance history",
     noHistory: "Empty history",
     course: "Course:",
     classroom: "classroom:",
@@ -134,10 +134,18 @@ const en = {
   },
   Auth: {
     noBiometric: "This device does not support biometric authentication.",
-    title: "Secure your data by adding an authentication method",
+    title: "Enter your authentication code to unlock your application",
     useWeakBio: "Use the current device lock method",
     useStrongBio: "Add a biometric authentication method",
-}
+    header: "Authenticate",
+  },
+  setPinStep1: {
+    Title: "Secure your data by adding a 4 digits PIN code",
+    header: "Save your PIN code",
+  },
+  setPinStep2: {
+    Title: "Confirm your PIN code",
+  },
 }
 
 export default en

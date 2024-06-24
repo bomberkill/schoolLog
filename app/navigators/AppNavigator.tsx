@@ -38,6 +38,10 @@ export type AppStackParamList = {
   // 🔥 Your screens go here
   bottomTab: undefined
 	Auth: undefined
+	SetPinStep1: undefined
+	SetPinStep2: {
+    pinCodeSet: string
+  }
 	// IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -56,10 +60,8 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 // React.useEffect(()=> {
 //   const handleLaunch = async ()=> {
 //     const hasLaunched = await AsyncStorage.getItem("hasLaunched")
-//     if(hasLaunched === null) {
-//       await AsyncStorage.setItem("hasLaunched", "true")
-//     } else {
-//       setIsFirstLaunch(false)
+//     if (hasLaunched) { 
+//      setIsFirstLaunch(false)
 //     }
 //   }
 //   handleLaunch()
@@ -73,10 +75,14 @@ const AppStack = observer(function AppStack() {
     <Stack.Navigator
       screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
     >
+      {/* {isFirstLaunch && (
+      )} */}
       <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
       {/** 🔥 Your screens go here */}
+			<Stack.Screen name="Auth" component={Screens.AuthScreen} />
       <Stack.Screen name="bottomTab" component={MainBottomTabNavigator} />
-			{/* <Stack.Screen name="Auth" component={Screens.AuthScreen} /> */}
+			<Stack.Screen name="SetPinStep1" component={Screens.SetPinStep1Screen} />
+			<Stack.Screen name="SetPinStep2" component={Screens.SetPinStep2Screen} />
 			{/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>
   )
